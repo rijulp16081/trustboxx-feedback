@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TrustBoxx Feedback</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+
+<style>
+/* Layout: single-column centered form, clean and trustworthy */
+
+:root {
+  --bg:        #0D0D16;
+  --surface:   #16161F;
+  --border:    #2A2A3C;
+  --border-focus: #7B3FE4;
+  --fg:        #F0F0FF;
+  --fg-2:      #A0A0C0;
+  --fg-3:      #505070;
+  --accent:    #7B3FE4;
+  --accent-hover: #6A30CC;
+  --accent-bg: #1E1030;
+  --success-bg: #0A1A10;
+  --success-fg: #4DD88A;
+  --success-border: #1A4A30;
+  --error-fg: #E05C5C;
+  --radius:    10px;
+  --radius-pill: 50px;
+  --radius-sm: 7px;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100%;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 48px;
+}
+
+.page-wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wordmark-icon {
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.page-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.25;
+  text-wrap: balance;
+  background: linear-gradient(90deg, #A78BFA 0%, #60A5FA 60%, #F472B6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-header p {
+  font-size: 13.5px;
+  color: var(--fg-2);
+  margin: 0;
+  max-width: 480px;
+}
+
+.logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  max-width: 100%;
+  align-self: flex-start;
+}
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 0 0 1px rgba(123,63,228,0.08), 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* Form fields */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.field label .optional {
+  font-weight: 400;
+  color: var(--fg-3);
+  margin-left: 4px;
+}
+
+.field input[type="text"],
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #0A0A12;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  appearance: none;
+}
+
+.field input[type="text"]:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--border-focus);
+  background: var(--surface);
+}
+
+.field input::placeholder,
+.field textarea::placeholder { color: var(--fg-3); }
+
+.field textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238AAFC8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+/* Validation messages (filled in by validation.js) */
+.info {
+  font-size: 12px;
+  color: var(--error-fg);
+  min-height: 0;
+}
+.info:empty { display: none; }
+
+/* Category chips */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 5px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fg-2);
+  background: #0A0A12;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  user-select: none;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+.chip.selected {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: #C4A8FF;
+  font-weight: 600;
+}
+
+/* Rating */
+.rating-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.rating-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--fg-2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  font-variant-numeric: tabular-nums;
+  font-family: inherit;
+}
+
+.rating-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.rating-btn.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.rating-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--fg-3);
+  margin-top: 4px;
+}
+
+/* Submit */
+.submit-btn {
+  width: 100%;
+  height: 44px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.01em;
+}
+
+.submit-btn:hover { background: var(--accent-hover); }
+.submit-btn:active { transform: scale(0.99); }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+#loader-icons {
+  font-size: 12px;
+  color: var(--fg-2);
+  text-align: center;
+}
+
+/* Toast (stand-in for the website's toastalert) */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  color: var(--success-fg);
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  display: none;
+  max-width: calc(100% - 32px);
+  text-align: center;
+}
+
+/* Divider */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* Footer note */
+.footer-note {
+  font-size: 12px;
+  color: var(--fg-3);
+  text-align: center;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  body { padding-block: 24px; }
+  .card { padding: 20px; }
+  .rating-btn { width: 30px; height: 30px; font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip, .rating-btn, .submit-btn { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <div class="page-header">
+    <img class="logo" src="trustboxx-logo.png" alt="TrustBoxx">
+    <h1>Share your feedback</h1>
+    <p>Your feedback helps us improve the TrustBoxx platform and the support we provide. All submissions are reviewed by the TrustBoxx team.</p>
+  </div>
+
+  <!-- Form card. IDs and names below match what validation.js expects. -->
+  <form class="card" id="contact-general" novalidate>
+
+    <div class="field">
+      <label for="enqcntname">Name</label>
+      <input type="text" id="enqcntname" name="name" placeholder="Your full name">
+      <div class="info" id="cntnameinfo"></div>
+    </div>
+
+    <div class="field">
+      <label for="enqcntemail">Email</label>
+      <input type="text" id="enqcntemail" name="email" placeholder="you@organisation.com">
+      <div class="info" id="cntemailinfo"></div>
+    </div>
+
+    <div class="field">
+      <label for="enqcntphone">Phone <span class="optional">(optional)</span></label>
+      <input type="text" id="enqcntphone" name="phone" placeholder="10-digit phone number">
+      <div class="info" id="cntphoneinfo"></div>
+    </div>
+
+    <div class="field">
+      <label for="enqcompany">Organisation</label>
+      <input type="text" id="enqcompany" name="company" placeholder="Your organisation or project name">
+    </div>
+
+    <div class="field">
+      <label for="enqrole">Your role <span class="optional">(optional)</span></label>
+      <select id="enqrole" name="role">
+        <option value="" disabled selected>Select your role</option>
+        <option value="IAO">Information Asset Owner (IAO)</option>
+        <option value="Researcher">Researcher</option>
+        <option value="Project Lead">Project Lead</option>
+        <option value="Other">Other</option>
+      </select>
+      <div class="info" id="roleinfo"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label>Category</label>
+      <div class="chip-group" id="chipGroup">
+        <span class="chip" data-val="Platform">Platform</span>
+        <span class="chip" data-val="Ingress">Ingress</span>
+        <span class="chip" data-val="Egress">Egress</span>
+        <span class="chip" data-val="Support">Support</span>
+        <span class="chip" data-val="Security">Security</span>
+        <span class="chip" data-val="Other">Other</span>
+      </div>
+      <input type="hidden" id="category" name="category" value="">
+    </div>
+
+    <div class="field">
+      <label for="cntreq">Feedback</label>
+      <textarea id="cntreq" name="message" maxlength="250" placeholder="Describe your experience, suggestion, or concern…" rows="5"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Overall experience</label>
+      <div class="rating-row" id="ratingRow">
+        <span class="rating-btn" data-val="1">1</span>
+        <span class="rating-btn" data-val="2">2</span>
+        <span class="rating-btn" data-val="3">3</span>
+        <span class="rating-btn" data-val="4">4</span>
+        <span class="rating-btn" data-val="5">5</span>
+      </div>
+      <div class="rating-labels">
+        <span>Poor</span>
+        <span>Excellent</span>
+      </div>
+      <input type="hidden" id="rating" name="rating" value="">
+    </div>
+
+    <button class="submit-btn" id="submit-cnt" type="submit">Submit feedback</button>
+    <div id="loader-icons">Sending…</div>
+
+  </form>
+
+  <p class="footer-note">
+    Feedback is handled in line with the TrustBoxx privacy notice.<br>
+    For urgent issues, contact your project's Service Lead directly.
+  </p>
+
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+  // Test-page helpers only. On the real site, the website provides toastalert
+  // and the validation script is used as-is.
+  function toastalert(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(toastalert._t);
+    toastalert._t = setTimeout(function () { t.style.display = "none"; }, 3000);
+  }
+
+  // Category chips -> hidden "category" field
+  document.getElementById("chipGroup").addEventListener("click", function (e) {
+    var chip = e.target.closest(".chip");
+    if (!chip) return;
+    document.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("selected"); });
+    chip.classList.add("selected");
+    document.getElementById("category").value = chip.dataset.val;
+  });
+
+  // Rating buttons -> hidden "rating" field
+  document.getElementById("ratingRow").addEventListener("click", function (e) {
+    var btn = e.target.closest(".rating-btn");
+    if (!btn) return;
+    document.querySelectorAll(".rating-btn").forEach(function (b) { b.classList.remove("selected"); });
+    btn.classList.add("selected");
+    document.getElementById("rating").value = btn.dataset.val;
+  });
+
+  // Clear chip/rating highlight when the form is reset after submit
+  document.getElementById("contact-general").addEventListener("reset", function () {
+    document.querySelectorAll(".chip, .rating-btn").forEach(function (el) { el.classList.remove("selected"); });
+  });
+</script>
+<script src="validation.js"></script>
+</body>
+</html>
