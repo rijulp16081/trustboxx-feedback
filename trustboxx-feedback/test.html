@@ -183,12 +183,18 @@ body {
 }
 
 /* Validation messages (filled in by validation.js) */
-.info {
+.field-error {
   font-size: 12px;
   color: var(--error-fg);
   min-height: 0;
 }
-.info:empty { display: none; }
+.field-error:empty { display: none; }
+
+.word-count {
+  font-size: 11px;
+  color: var(--fg-3);
+  text-align: right;
+}
 
 /* Category chips */
 .chip-group {
@@ -286,7 +292,7 @@ body {
 .submit-btn:active { transform: scale(0.99); }
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-#loader-icons {
+#feedback-loader {
   font-size: 12px;
   color: var(--fg-2);
   text-align: center;
@@ -346,48 +352,48 @@ body {
   </div>
 
   <!-- Form card. IDs and names below match what validation.js expects. -->
-  <form class="card" id="contact-general" novalidate>
+  <form class="card" id="feedback-form" novalidate>
 
     <div class="field">
-      <label for="enqcntname">Name</label>
-      <input type="text" id="enqcntname" name="name" placeholder="Your full name">
-      <div class="info" id="cntnameinfo"></div>
+      <label for="feedback-name">Name</label>
+      <input type="text" id="feedback-name" name="name" placeholder="Your full name">
+      <div class="field-error" id="feedback-name-error"></div>
     </div>
 
     <div class="field">
-      <label for="enqcntemail">Email</label>
-      <input type="text" id="enqcntemail" name="email" placeholder="you@organisation.com">
-      <div class="info" id="cntemailinfo"></div>
+      <label for="feedback-email">Email</label>
+      <input type="text" id="feedback-email" name="email" placeholder="you@organisation.com">
+      <div class="field-error" id="feedback-email-error"></div>
     </div>
 
     <div class="field">
-      <label for="enqcntphone">Phone <span class="optional">(optional)</span></label>
-      <input type="text" id="enqcntphone" name="phone" placeholder="10-digit phone number">
-      <div class="info" id="cntphoneinfo"></div>
+      <label for="feedback-phone">Phone <span class="optional">(optional)</span></label>
+      <input type="text" id="feedback-phone" name="phone" placeholder="10-digit phone number">
+      <div class="field-error" id="feedback-phone-error"></div>
     </div>
 
     <div class="field">
-      <label for="enqcompany">Organisation</label>
-      <input type="text" id="enqcompany" name="company" placeholder="Your organisation or project name">
+      <label for="feedback-organisation">Organisation</label>
+      <input type="text" id="feedback-organisation" name="company" placeholder="Your organisation or project name">
     </div>
 
     <div class="field">
-      <label for="enqrole">Your role <span class="optional">(optional)</span></label>
-      <select id="enqrole" name="role">
+      <label for="feedback-role">Your role <span class="optional">(optional)</span></label>
+      <select id="feedback-role" name="role">
         <option value="" disabled selected>Select your role</option>
         <option value="IAO">Information Asset Owner (IAO)</option>
         <option value="Researcher">Researcher</option>
         <option value="Project Lead">Project Lead</option>
         <option value="Other">Other</option>
       </select>
-      <div class="info" id="roleinfo"></div>
+      <div class="field-error" id="feedback-role-error"></div>
     </div>
 
     <hr class="divider">
 
     <div class="field">
       <label>Category</label>
-      <div class="chip-group" id="chipGroup">
+      <div class="chip-group" id="category-chips">
         <span class="chip" data-val="Platform">Platform</span>
         <span class="chip" data-val="Ingress">Ingress</span>
         <span class="chip" data-val="Egress">Egress</span>
@@ -395,17 +401,24 @@ body {
         <span class="chip" data-val="Security">Security</span>
         <span class="chip" data-val="Other">Other</span>
       </div>
-      <input type="hidden" id="category" name="category" value="">
+      <input type="hidden" id="feedback-category" name="category" value="">
+      <!-- Shown only when "Other" is selected -->
+      <div id="category-other-field" hidden>
+        <input type="text" id="feedback-category-other" name="category_other" maxlength="50" placeholder="Please specify (max 50 characters)" disabled>
+        <div class="field-error" id="feedback-category-other-error"></div>
+      </div>
     </div>
 
     <div class="field">
-      <label for="cntreq">Feedback</label>
-      <textarea id="cntreq" name="message" maxlength="250" placeholder="Describe your experience, suggestion, or concern…" rows="5"></textarea>
+      <label for="feedback-message">Feedback</label>
+      <textarea id="feedback-message" name="message" maxlength="2000" placeholder="Describe your experience, suggestion, or concern… (max 150 words)" rows="5"></textarea>
+      <div class="field-error" id="feedback-message-error"></div>
+      <div class="word-count" id="feedback-message-counter">0 / 150 words</div>
     </div>
 
     <div class="field">
       <label>Overall experience</label>
-      <div class="rating-row" id="ratingRow">
+      <div class="rating-row" id="rating-buttons">
         <span class="rating-btn" data-val="1">1</span>
         <span class="rating-btn" data-val="2">2</span>
         <span class="rating-btn" data-val="3">3</span>
@@ -416,11 +429,11 @@ body {
         <span>Poor</span>
         <span>Excellent</span>
       </div>
-      <input type="hidden" id="rating" name="rating" value="">
+      <input type="hidden" id="feedback-rating" name="rating" value="">
     </div>
 
-    <button class="submit-btn" id="submit-cnt" type="submit">Submit feedback</button>
-    <div id="loader-icons">Sending…</div>
+    <button class="submit-btn" id="feedback-submit" type="submit">Submit feedback</button>
+    <div id="feedback-loader">Sending…</div>
 
   </form>
 
@@ -445,26 +458,41 @@ body {
   }
 
   // Category chips -> hidden "category" field
-  document.getElementById("chipGroup").addEventListener("click", function (e) {
+  document.getElementById("category-chips").addEventListener("click", function (e) {
     var chip = e.target.closest(".chip");
     if (!chip) return;
     document.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("selected"); });
     chip.classList.add("selected");
-    document.getElementById("category").value = chip.dataset.val;
+    document.getElementById("feedback-category").value = chip.dataset.val;
+
+    // "Other" shows the extra text box; any other chip hides and clears it
+    var isOther = chip.dataset.val === "Other";
+    var otherInput = document.getElementById("feedback-category-other");
+    document.getElementById("category-other-field").hidden = !isOther;
+    otherInput.disabled = !isOther;   // disabled fields are not submitted
+    if (!isOther) {
+      otherInput.value = "";
+      otherInput.style.borderColor = "";
+      document.getElementById("feedback-category-other-error").innerHTML = "";
+    } else {
+      otherInput.focus();
+    }
   });
 
   // Rating buttons -> hidden "rating" field
-  document.getElementById("ratingRow").addEventListener("click", function (e) {
+  document.getElementById("rating-buttons").addEventListener("click", function (e) {
     var btn = e.target.closest(".rating-btn");
     if (!btn) return;
     document.querySelectorAll(".rating-btn").forEach(function (b) { b.classList.remove("selected"); });
     btn.classList.add("selected");
-    document.getElementById("rating").value = btn.dataset.val;
+    document.getElementById("feedback-rating").value = btn.dataset.val;
   });
 
   // Clear chip/rating highlight when the form is reset after submit
-  document.getElementById("contact-general").addEventListener("reset", function () {
+  document.getElementById("feedback-form").addEventListener("reset", function () {
     document.querySelectorAll(".chip, .rating-btn").forEach(function (el) { el.classList.remove("selected"); });
+    document.getElementById("category-other-field").hidden = true;
+    document.getElementById("feedback-category-other").disabled = true;
   });
 </script>
 <script src="validation.js"></script>
